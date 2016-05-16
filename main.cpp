@@ -22,7 +22,7 @@ void initialize(const string_t &address) {
 
     uri_builder uri(address);
 
-    uri.append_path(U("checkurl"));
+    uri.append_path(U("filter"));
 
 
     auto addr = uri.to_uri().to_string();
@@ -52,7 +52,7 @@ void shutdown() {
 
 bool validate(string_t const &username, string_t const &password)
 {
-    uri_builder uri("http://5.189.150.113:8000/users");
+    uri_builder uri("http://check_credentials_url.com");
 
     // build the query parameters
     auto query = uri
@@ -77,27 +77,21 @@ void handle_get(http_request request) {
     if (std::regex_match(request.request_uri().query(), result, std::regex("^url=.*?(www.*)$"))) {
 
         if (result.size() < 2)
-            request.reply(status_codes::NotImplemented, U("invalid data"));
+            request.reply(status_codes::NotImplemented, U("invalid data in uri"));
         else {
-
-
-            if(validate("test","test"))
-            {
-                Result p = Result(result[1],"xxx",88);
-                request.reply(status_codes::OK, p.ToJSON());
-            } else
-                request.reply(status_codes::NotImplemented, U("invalid data"));
+            Result p = Result(result[1],"category_test");
+            request.reply(status_codes::OK, p.ToJSON());
         }
     }
     else
-        request.reply(status_codes::NotImplemented, U("invalid data"));
+        request.reply(status_codes::NotImplemented, U("invalid uri"));
 
 }
 
 
 int main(int argc, char *argv[]) {
     //set default values
-    utility::string_t port = U(":8200");
+    utility::string_t port = U(":9000");
     utility::string_t host = U("http://localhost");
 
 
@@ -119,7 +113,7 @@ int main(int argc, char *argv[]) {
             std::cout << "Rest webserver help: \n"
             << " > USAGE webserver \n"
             << "      -h[--host] set webserver host - default to 9000 \n"
-            << "      -p[--port] set webserver port - default to http://localhost\n"
+            << "      -p[--port] set webserver port - default to http://localhost"
             << std::endl << std::endl;
 
             return 1;
@@ -141,8 +135,7 @@ int main(int argc, char *argv[]) {
         std::cerr << desc << std::endl;
         return 1;
     }
-
-
+ 
 
     //append the port to the host address
     host.append(port);
